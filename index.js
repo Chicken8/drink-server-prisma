@@ -1,5 +1,25 @@
-const { prisma } = require("./generated/prisma-client");
+const path = require("path");
+const fs = require("fs");
+const { makeExecutableSchema } = require("graphql-tools");
 const { GraphQLServer } = require("graphql-yoga");
+const { prisma } = require("./generated/prisma-client");
+
+const directiveResolvers = {
+  isAuthenticated: (next, source, { role }, context) => {
+    if (!context.currentUser) {
+      throw new Error(`Must login`);
+    }
+    return next();
+  },
+  isAdmin: (next, source, { role }, context) => {
+    if (!context.currentUser || !context.currentUser.isAdmin) {
+      throw new Error(
+        `You are not allowed to access. Require admin permission.`
+      );
+    }
+    return next();
+  }
+};
 
 const resolvers = {
   Query: {
@@ -142,9 +162,16 @@ const resolvers = {
   }
 };
 
-const server = new GraphQLServer({
-  typeDefs: "./schema.graphql",
+const schema = makeExecutableSchema({
+  typeDefs: fs.readFileSync(path.resolve(__dirname, "./schema.graphql"), {
+    encoding: "utf8"
+  }),
   resolvers,
+  directiveResolvers
+});
+
+const server = new GraphQLServer({
+  schema,
   context: async ({ req }) => {
     // fake current user util implementing authentication
     const currentUser = await prisma.user({ email: "admin@test.com" });
