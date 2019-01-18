@@ -1,0 +1,73 @@
+type Query {
+  shops: [Shop!]!
+  users: [User!]!
+  orders: [Order!]!
+  order(id: ID!): Order
+  me: User
+}
+
+type Mutation {
+  createShop(name: String!, address: String, phone: String): Shop!
+  updateShop(id: ID!, name: String, address: String, phone: String): Shop!
+  createOrder(shopID: ID!, title: String!, endedAt: DateTime!): Order!
+  updateOrder(id: ID!, title: String!, endedAt: DateTime): Order!
+  deleteOrder(id: ID!): Order!
+  createOrderItem(orderID: ID!, name: String!, price: Int!, variety: String): OrderItem!
+}
+
+type User {
+  id: ID!
+  email: String!
+  isAdmin: Boolean!
+}
+
+type Shop {
+  id: ID!
+  name: String!
+  address: String
+  phone: String
+  creator: User!
+  orders: [Order!]!
+}
+
+type Menu {
+  id: ID!
+  picture: File!
+}
+
+type Order {
+  id: ID!
+  status: OrderStatus!
+  title: String!
+  shop: Shop!
+  creator: User!
+  endedAt: DateTime!
+  deletedAt: DateTime
+  items: [OrderItem!]!
+}
+
+type OrderItem {
+  id: ID!
+  order: Order!
+  user: User!
+  name: String!
+  price: Int!
+  """
+  配料、冰塊、甜度....
+  """
+  variety: String
+}
+
+type File {
+  filename: String!
+  mimetype: String!
+  encoding: String!
+}
+
+enum OrderStatus {
+  OPEN
+  DELETED
+  END
+}
+
+scalar DateTime

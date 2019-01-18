@@ -1,0 +1,9 @@
+mutation {
+  adminUser: createUser(data: {
+    email: "admin@test.com"
+    isAdmin: true
+  }) { id },
+  normalUser: createUser(data: {
+    email: "user@test.com"
+  }) { id },
+}

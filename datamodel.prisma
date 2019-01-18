@@ -1,0 +1,48 @@
+type User {
+  id: ID! @unique
+  email: String! @unique
+  isAdmin: Boolean! @default(value: "false")
+}
+
+type Shop {
+  id: ID! @unique
+  name: String! @unique
+  address: String
+  phone: String
+  menu: Menu
+  creator: User!
+  orders: [Order!]!
+}
+
+type Menu {
+  id: ID! @unique
+  picture: File!
+}
+
+type Order {
+  id: ID! @unique
+  shop: Shop
+  creator: User!
+  endedAt: DateTime!
+  title: String!
+  items: [OrderItem!]!
+  deletedAt: DateTime
+}
+
+type OrderItem {
+  id: ID! @unique
+  order: Order!
+  user: User!
+  name: String!
+  price: Int!
+  """
+  配料、冰塊、甜度....
+  """
+  variety: String
+}
+
+type File {
+  filename: String!
+  mimetype: String!
+  encoding: String!
+}
